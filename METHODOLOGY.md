@@ -155,9 +155,18 @@ factored out before comparison, both fully mechanical:
   (§8). Anything new = regression.
 - **Structural validation** (`process_corpus.py --stage 4`) — every
   footnote call `N-` must have its note on the same page; page numbers
-  unique, blank-line-preceded. 21,926 canonical pages, zero errors
-  (235 transcription errors of the printed edition itself are
-  whitelisted as `KNOWN_ERRORS`, listed individually in the script).
+  unique, blank-line-preceded. All 49,357 pages of both corpora, zero
+  errors (566 orphan calls of the printed edition itself — 142
+  Canonical, 424 Non-Canonical — are whitelisted as `KNOWN_ERRORS`,
+  listed individually in the script). Note extraction understands both
+  numbering styles of the edition: bare (`1 ma. vuddhe.`) and dotted
+  (`1. vi. cul. 7/379.`, `1-2. ma. …`), the latter standard in the
+  commentaries' apparatus; and `N-` immediately followed by digits+dot
+  is the Patimokkha dual rule numbering (`[30] 11-1. yo pana …`), not
+  a call. Before 2026-07-16 the validator lacked the dotted style, so
+  it only covered Canonical and whitelisted 235 entries, 93 of which
+  were extraction artifacts (their note exists, in dotted form), not
+  edition errors.
 - **Two independent implementations** — `process_corpus.py` (Python)
   and `process_corpus.pl` (Perl) are maintained in parallel and their
   outputs are byte-identical, 115/115 (`cmp`). A bug would have to be

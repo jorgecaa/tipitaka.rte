@@ -106,9 +106,12 @@ footnote: * mīkārkkhag …             ← star note (Burmese collation)
 - In the commentaries, note numbers sometimes carry a dot (`1. ma. …`,
   ~17 % there, rare in the canon). Accept `^\d+(-\d+)*\.?\s`.
 - Body-call ↔ note linkage is per page. Expect imperfection inherited
-  from the printed edition: 235 orphan calls are individually
-  whitelisted in `utils/process_corpus.py` (`KNOWN_ERRORS`), and ghost
-  notes (note without call) exist.
+  from the printed edition: 566 orphan calls (142 in the canon, 424 in
+  the commentaries) are individually whitelisted in
+  `utils/process_corpus.py` (`KNOWN_ERRORS`), and 615 ghost notes
+  (note without call) exist.
+- In `70-Patimokkhapali.txt`, `N-M.` after a `[N]` anchor is the dual
+  rule numbering (`[30] 11-1. yo pana …`), not a footnote call.
 
 **Witness siglas** (abbreviations naming the source of a variant):
 
