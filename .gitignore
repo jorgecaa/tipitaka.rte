@@ -8,4 +8,3 @@ verification_checklist.out
 __pycache__/
 *.pyc
 docs/
-CLAUDE.md
