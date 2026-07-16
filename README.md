@@ -18,3 +18,7 @@ for the full provenance chain, the catalog of every transformation with
 counts, the verification gates (`utils/verify_pali.py`,
 `utils/parser_simple.py`), and the commands to audit every claim
 yourself.
+
+**Consuming the corpus:** see **FORMAT.md** — the exact file format
+(line grammar, markers, apparatus and sigla), a minimal reference
+parser, and a checklist for using the corpus in another project.
