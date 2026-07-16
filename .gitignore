@@ -7,7 +7,5 @@ verification_checklist.log
 verification_checklist.out
 __pycache__/
 *.pyc
-Canonical/
-Non-Canonical/
 docs/
 CLAUDE.md
