@@ -11,6 +11,7 @@ A Pāli Tipiṭaka text corpus extracted ("ripped") from BUDSIR (Buddhist Script
 - `txt/Canonical/` (45 files) and `txt/Non-Canonical/` (70 files) — the raw extracted text, committed in git. The pristine source of truth is commit `07c937d` ("ripped from BUDSIR"); treat `txt/` as immutable input.
 - `Canonical/` and `Non-Canonical/` at the repo root — **generated output** of the pipeline, committed in git (commit `103d43e` and successors). Never hand-edit these; regenerate with the pipeline and commit the regenerated result.
 - `utils/process_corpus.py` and `utils/process_corpus.pl` — two equivalent implementations of the pipeline (same output).
+- `utils/aparatus.py` — local-only diagnostic tool (deliberately excluded from git via `.git/info/exclude`, so absent from fresh clones): a census of every critical-apparatus incident, classified by actionability, reusing stage-4's regexes and `KNOWN_ERRORS`. It complements — never replaces — stage 4 and the two committed gates.
 - `docs/` (gitignored, local only) — reference documentation copied from the predecessor project (`~/Code/budsir/budsir_c/tipitaka.rte`): `DOC.md` (corpus catalog, corruption taxonomy, parser routing, correction protocols), `DOCUMENTATION.md` (original Spanish version), `known_errors.txt`. Read `docs/DOC.md` before making any claim about the corpus.
 
 ## Commands
