@@ -1,3 +1,4 @@
+# Build artifacts
 out/
 *.pdf
 *.aux
@@ -7,4 +8,43 @@ verification_checklist.log
 verification_checklist.out
 __pycache__/
 *.pyc
+
+# Reference docs (local only)
 docs/
+
+# ── Layer 2 — never push (tracked in .git-analysis/ local repo instead) ──
+
+# Scripts (all of utils/ except the four layer-1 pipeline scripts)
+utils/*
+!utils/process_corpus.py
+!utils/process_corpus.pl
+!utils/verify_pali.py
+!utils/parser_simple.py
+
+# Reader
+read
+
+# Structure & tracking
+STRUCTURE.md
+TODO.md
+
+# Deliverables + caches at repo root
+sutta-labels.csv
+sutta-labels-reviewed.csv
+sutta-labels-README.md
+commentary-index.csv
+commentary-index-README.md
+sutta-index.csv
+sutta-index-projected.csv
+sutta-fingerprints.json
+sandhi-*.json
+sandhi-unresolved.txt
+helmer-verdicts.csv
+rematch-results.csv
+*-cache.json
+bj-index.csv
+bj-roman.json
+
+# Local repos & skills
+.git-analysis/
+.claude/skills/
