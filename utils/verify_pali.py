@@ -1,32 +1,26 @@
 #!/usr/bin/env python3
-"""verify_pali.py — Pali-integrity gate against the hand-corrected reference.
+"""verify_pali.py — dual-hash Pali-integrity gate.
 
-Cardinal rule of this repo: the Pali letter stream is inviolable.  This
-script proves it after every pipeline change: the letters-only projection
-of every output file must be byte-identical to that of the reference
-corpus (the predecessor project's hand-corrected corpus).
+Two cryptographically independent hashes (SHA-256 + BLAKE2b) of the
+Pali word sequence of every output file, compared against the reference
+corpus.  Both must match — orthogonal algorithms ensure no hash collision
+can mask a corruption.
 
-Two documented, letter-bearing transformations are factored out before
-projecting:
-  * our side gains "footnote:" labels on rescued spilled lines (3c) —
-    stripped from BOTH sides;
-  * the reference still carries the transliterated HTML husk that stage
-    2h removes — stripped from the reference side.
-
-Rationale and the full transformation catalog: METHODOLOGY.md (§6–7).
+Same documented transforms factored out as the original:
+  * footnote: labels on rescued spilled lines
+  * HTML husk residue in the reference
 
 Usage:  python3 utils/verify_pali.py [reference_dir]
-Exit status: 0 = 115/115 identical, 1 = any file's Pali words differ.
+Exit:   0 = 115/115 both hashes match, 1 = mismatch.
 """
 
+import hashlib
 import os
 import re
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-# Reference resolution: CLI argument, else $TIPITAKA_REFERENCE_DIR, else
-# the predecessor project checked out alongside this repository.
 DEFAULT_REF = Path(
     os.environ.get("TIPITAKA_REFERENCE_DIR")
     or REPO.parent / "budsir" / "budsir_c" / "tipitaka.rte" / "txt")
@@ -39,15 +33,18 @@ LETTERS = re.compile(r'[^\W\d_]+')
 
 
 def project(text: str, is_reference: bool) -> list:
-    """Return the word sequence (maximal letter runs), husk and labels
-    factored out.  Comparing word sequences — not just the flat letter
-    stream — also catches word merges and splits: an edit that deleted a
-    space between two Pali words would keep the letter stream intact but
-    change the token sequence, and is detected here."""
+    """Return the ordered Pali word sequence, husk and labels factored out."""
     text = FN_LABEL.sub(r'\1', text)
     if is_reference:
         text = HTML_HUSK.sub('', text)
     return LETTERS.findall(text)
+
+
+def dual_hash(words: list) -> tuple:
+    """Return (sha256_hex, blake2b_hex) of the joined word sequence."""
+    payload = ' '.join(words).encode('utf-8')
+    return (hashlib.sha256(payload).hexdigest(),
+            hashlib.blake2b(payload, digest_size=32).hexdigest())
 
 
 def main() -> int:
@@ -55,24 +52,43 @@ def main() -> int:
     if not ref_root.is_dir():
         print(f"referencia no encontrada: {ref_root}", file=sys.stderr)
         return 2
+
     ok = total = 0
     bad = []
+
     for d in ("Canonical", "Non-Canonical"):
         for fp in sorted((REPO / d).glob("*.txt")):
             total += 1
-            out = project(fp.read_text(encoding="utf-8"), False)
-            ref = project((ref_root / d / fp.name).read_text(encoding="utf-8"),
-                          True)
-            if out == ref:
+            out_words = project(fp.read_text(encoding="utf-8"), False)
+            ref_words = project(
+                (ref_root / d / fp.name).read_text(encoding="utf-8"), True)
+
+            sha_out, blake_out = dual_hash(out_words)
+            sha_ref, blake_ref = dual_hash(ref_words)
+
+            sha_ok = sha_out == sha_ref
+            blake_ok = blake_out == blake_ref
+
+            if sha_ok and blake_ok:
                 ok += 1
             else:
-                # first divergence point, for diagnosis
-                n = next((k for k, (a, b) in enumerate(zip(out, ref))
-                          if a != b), min(len(out), len(ref)))
-                bad.append(f"{d}/{fp.name}: palabra {n}: "
-                           f"{out[max(0, n-3):n+2]} != "
-                           f"{ref[max(0, n-3):n+2]}")
+                rel = f"{d}/{fp.name}"
+                details = []
+                if not sha_ok:
+                    details.append(f"SHA-256 mismatch")
+                if not blake_ok:
+                    details.append(f"BLAKE2b mismatch")
+                # Find first divergent word position
+                n = next((k for k, (a, b) in enumerate(zip(out_words, ref_words))
+                          if a != b), min(len(out_words), len(ref_words)))
+                context_out = out_words[max(0, n-2):n+3]
+                context_ref = ref_words[max(0, n-2):n+3]
+                bad.append(
+                    f"{rel}: {'; '.join(details)} | "
+                    f"word {n}: {context_out} != {context_ref}")
+
     print(f"Secuencia de palabras pali idéntica a la referencia: {ok}/{total}")
+    print(f"  (verificada con SHA-256 + BLAKE2b — hashes criptográficos independientes)")
     if bad:
         print("LETRAS PALI ALTERADAS EN:")
         for b in bad:
