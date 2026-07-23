@@ -42,9 +42,16 @@ sandhi-unresolved.txt
 helmer-verdicts.csv
 rematch-results.csv
 *-cache.json
+helmer-caches/
+*.csv.*-backup
 bj-index.csv
 bj-roman.json
 
 # Local repos & skills
 .git-analysis/
 .claude/skills/
+.zcode/
+
+# El Excel del índice SÍ se publica: es el deliverable consumible de layer 2
+# (metadato, ni una palabra de pali) y va versionado a propósito.
+!tipitaka-index.xlsx
